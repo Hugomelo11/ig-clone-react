@@ -1,15 +1,36 @@
 import React from "react";
 import { Photo } from "../models/photo";
+import { updateLike, getPhotos } from "../services/photoServices";
 
 interface PhotoViewProp {
-  photo: Photo;
-
+  photo: Photo
+  setPhotos: Function
 }
 
-function PhotoView({ photo }: PhotoViewProp) {
+function PhotoView({ photo, setPhotos }: PhotoViewProp) {
+  
+  async function handleLike(photoId: string) {
+    const newLike = await updateLike(photoId);
+    console.log(newLike)
+    setPhotos((photos: Photo[])=> {
+      return photos.map((photo:Photo) => photo._id==photoId ? {...photo, likes: newLike}: photo)
+    })
+  }
+
+
   return (
     <>
-      <div><img src={photo.photoUrl}/></div>
+      <div>
+        <h2>{photo.description || ""}</h2>
+        <img src={photo.photoUrl} />
+        <div
+          onClick={() => {
+            handleLike(photo._id || "");
+          }}
+        >
+          🤙🏻 {photo.likes || 0}
+        </div>
+      </div>
     </>
   );
 }
